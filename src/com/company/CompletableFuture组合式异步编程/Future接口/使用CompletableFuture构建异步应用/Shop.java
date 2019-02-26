@@ -1,6 +1,8 @@
 package com.company.CompletableFuture组合式异步编程.Future接口.使用CompletableFuture构建异步应用;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -12,6 +14,15 @@ import java.util.concurrent.TimeUnit;
 public class Shop {
     public double getPrice(String product) {
         return calculatePrice(product);
+    }
+
+    public Future<Double> getPriceAsync(String product) {
+        CompletableFuture<Double> futurePrice = new CompletableFuture<>();
+        new Thread(() -> {
+            double price = calculatePrice(product);
+            futurePrice.complete(price);
+        }).start();
+        return futurePrice;
     }
 
     private double calculatePrice(String product) {
@@ -31,5 +42,7 @@ public class Shop {
         }
     }
 
-
+    public static void main(String[] args) {
+        Shop shop = new Shop();
+    }
 }
