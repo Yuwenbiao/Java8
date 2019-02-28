@@ -3,9 +3,7 @@ package com.company.CompletableFuture组合式异步编程.Future接口.使用Co
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -121,5 +119,21 @@ public class Shop {
     /**
      * 寻找更好的方案
      */
+    private List<String> findPricesSetThreadCount(String product) {
+        List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItASll"));
+        Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100), r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
+        List<CompletableFuture<String>> priceFutures = shops.stream().map(shop -> CompletableFuture.supplyAsync(() -> shop.getShopName() + " price is " + shop.getPrice(product), executor)).collect(Collectors.toList());
+        return priceFutures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+    }
 
+    /**
+     * 添加折扣
+     */
+    private String getPricesDiscount(String product) {
+        return "";
+    }
 }
