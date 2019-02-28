@@ -100,4 +100,26 @@ public class Shop {
         List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItASll"));
         return shops.stream().map(shop -> String.format("%s price is %.2f", shop.getShopName(), shop.getPrice(product))).collect(Collectors.toList());
     }
+
+    /**
+     * 使用并行流对请求进行并行操作
+     */
+    private List<String> findPricesParallel(String product) {
+        List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItASll"));
+        return shops.parallelStream().map(shop -> String.format("%s price is %.2f", shop.getShopName(), shop.getPrice(product))).collect(Collectors.toList());
+    }
+
+    /**
+     * 使用CompletableFuture发起异步请求
+     */
+    private List<String> findPricesCompletableFuture(String product) {
+        List<Shop> shops = Arrays.asList(new Shop("BestPrice"), new Shop("LetsSaveBig"), new Shop("MyFavoriteShop"), new Shop("BuyItASll"));
+        List<CompletableFuture<String>> priceFutures = shops.stream().map(shop -> CompletableFuture.supplyAsync(() -> shop.getShopName() + " price is " + shop.getPrice(product))).collect(Collectors.toList());
+        return priceFutures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+    }
+
+    /**
+     * 寻找更好的方案
+     */
+
 }
